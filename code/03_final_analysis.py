@@ -28,7 +28,8 @@ DATA    = PROJ / "data"
 RESULTS = PROJ / "results"
 FIGA    = PROJ / "figures" / "analysis"
 RESULTS.mkdir(parents=True, exist_ok=True); FIGA.mkdir(parents=True, exist_ok=True)
-DS = Path("/Volumes/SanDisk/Datasets Big documments/Charles_PSTOV-12-07-27")
+import charles_io
+DS = charles_io.data_root()
 
 ORDER = [
     ("Charles pt027","charles","pt027"),("Charles pt028","charles","pt028"),
@@ -78,11 +79,10 @@ def apparent_axis(I_vec, aVF_vec, theta_deg):
     iI = I_vec/np.linalg.norm(I_vec); iF = aVF_vec/np.linalg.norm(aVF_vec)
     return float(np.degrees(np.arctan2(H@iF, H@iI)))
 
-AXSWEEP  = np.arange(-30, 91, 15)          # normal axis range for axis shift
 AMPSWEEP = np.arange(0, 360, 10)           # full frontal circle for amplitude comparison
 
 def main():
-    picks = json.loads((DATA/"lund_picks_corrected.json").read_text())  # YOUR audited placements
+    picks = json.loads((DATA/"lund_picks_corrected.json").read_text())  # audited placements
     rows, geom = [], {}
     for label, cohort, pid in ORDER:
         torso, heart = (load_charles(pid) if cohort=="charles" else load_ecgi(pid))

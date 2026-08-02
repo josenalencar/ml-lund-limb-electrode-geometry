@@ -31,10 +31,9 @@ import matplotlib.pyplot as plt
 
 PROJ   = Path(__file__).resolve().parents[1]
 DATA   = PROJ / "data"; RESULTS = PROJ / "results"; FIGA = PROJ / "figures" / "analysis"
-MLROOT = PROJ.parent
-DS     = Path("/Volumes/SanDisk/Datasets Big documments/Charles_PSTOV-12-07-27")
-sys.path.insert(0, str(MLROOT / "code"))
-import walls_deep_pipeline as wdp
+import charles_io
+DS     = charles_io.data_root()
+import charles_io as wdp
 spec = importlib.util.spec_from_file_location("ac", str(Path(__file__).parent / "02_apply_corrections.py"))
 m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
 

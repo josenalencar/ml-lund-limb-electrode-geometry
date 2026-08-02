@@ -19,7 +19,8 @@ data/
                                of the 12 torso surfaces, after manual audit. Six 3-D points per
                                subject (ml_RA, ml_LA, ml_LL, lund_RA, lund_LA, lund_LL), in the
                                coordinate frame of that subject's source mesh.
-                               Convention: +X = patient's left, +Y = posterior, +Z = superior.
+  vlead_picks_audited.json     Audited precordial electrode coordinates V1-V9 for the subject
+                               used in the signal-level analysis.
 
 results/
   final_geometry.csv           Per-subject WCT displacement (components, 3-D magnitude, and
@@ -35,6 +36,8 @@ results/
                                fractions. Subject pt027, 32 paced beats.
 
 code/
+  charles_io.py                Readers for the Charles/PSTOV datasets, 12-lead derivation and
+                               QRS detection. Shared by the scripts below.
   03_final_analysis.py         WCT displacement, lead rotations, frontal axis, limb-lead vectors.
   04_pt027_bem_signal.py       Boundary-element forward simulation, limb leads and precordial
                                contamination for pt027.
@@ -42,16 +45,31 @@ code/
   15_bem_v1v9_direction.py     Per-lead V1-V9 analysis across the 32 beats.
 ```
 
-Every statistic reported in the manuscript can be recomputed from `results/*.csv` alone.
-Re-running `code/` additionally requires the source meshes and signals.
+## Reproducing the results
+
+Every statistic reported in the manuscript can be read directly from `results/*.csv`, with no
+source data required. To regenerate those files, obtain the source meshes and recordings as
+described below, then:
+
+```bash
+pip install -r requirements.txt
+export MLLUND_DATA_ROOT=/path/to/Charles_PSTOV-12-07-27
+python code/03_final_analysis.py        # cohort geometry, N = 12
+python code/08_geometry_predictions.py  # size measures and habitus regression
+python code/04_pt027_bem_signal.py      # forward simulation, limb leads and V1-V6
+python code/15_bem_v1v9_direction.py    # V1-V9 per-lead analysis
+```
+
+`MLLUND_DATA_ROOT` must point at the directory holding the per-subject folders (`027`, `028`,
+`029`) and the `ECGI_Challenge_2026_Training` directory. The scripts fail with an explicit
+message if it is unset.
 
 ## Units and conventions
 
 - Electrode and mesh coordinates: **millimetres**.
 - Body-surface potentials: **millivolts** (the source `.mat` files carry an explicit `unit` field).
 - Sampling rate of the pt027 body-surface recordings: **2000 Hz**, as documented in the dataset
-  ReadMe. Note that `sampling_hz` is hard-coded as 1000 in an upstream loader dataclass; that
-  field is metadata only and is not read by any analysis in this repository.
+  ReadMe. QRS windows are reported in milliseconds using that rate.
 - Coordinate frame: right-handed, +X = patient's left, +Y = posterior, +Z = superior.
 - WCT position is the centroid of the three limb-electrode positions; WCT potential is the mean
   of the three limb-electrode potentials.

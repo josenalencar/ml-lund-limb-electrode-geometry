@@ -32,11 +32,9 @@ DATA      = PROJ / "data"
 RESULTS   = PROJ / "results"
 FIGA      = PROJ / "figures" / "analysis"
 RESULTS.mkdir(parents=True, exist_ok=True); FIGA.mkdir(parents=True, exist_ok=True)
-ORIG_CODE = PROJ.parent / "code"          # walls_deep_pipeline + T3_papouchado_test
-DS        = Path("/Volumes/SanDisk/Datasets Big documments/Charles_PSTOV-12-07-27")
+DS        = None  # resolved in main() from MLLUND_DATA_ROOT
 
-sys.path.insert(0, str(ORIG_CODE))
-import walls_deep_pipeline as wdp
+import charles_io as wdp
 
 LIMB = ("I", "II", "III", "aVR", "aVL", "aVF")
 VC   = ("V1", "V2", "V3", "V4", "V5", "V6")
@@ -50,6 +48,7 @@ def nearest_node(torso_pts, xyz):
     return int(d.argmin()), float(d.min())
 
 def main():
+    DS = wdp.data_root()
     pt27 = DS / "027"
     geom = wdp.load_charles_geometry(pt27)
     torso_pts = geom.torso_pts
@@ -64,7 +63,7 @@ def main():
     inv = np.linalg.inv(A_m.T @ A_m + lam**2 * np.eye(A.shape[1])) @ A_m.T
 
     # --- AUDITED ML & Lund picks -> nearest torso node (same daltorso frame) ---
-    picks = json.loads((DATA / "lund_picks_corrected.json").read_text())["Charles pt027"]  # YOUR audited placements
+    picks = json.loads((DATA / "lund_picks_corrected.json").read_text())["Charles pt027"]  # audited placements
     nodes = {"ML": {}, "Lund": {}}; snaps = {}
     print("Mapping audited picks -> nearest torso node (distance in mm):")
     for cfg, pre in (("ML", "ml"), ("Lund", "lund")):

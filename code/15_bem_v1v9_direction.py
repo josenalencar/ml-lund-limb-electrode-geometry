@@ -18,12 +18,9 @@ from pathlib import Path
 import numpy as np, pandas as pd, scipy.io as sio
 
 PROJ = Path(__file__).resolve().parents[1]; DATA = PROJ/"data"; RES = PROJ/"results"
-ORIG = PROJ.parent/"code"; sys.path.insert(0, str(ORIG))
-import walls_deep_pipeline as wdp
+import charles_io as wdp
 
-# new Google-Drive dataset location
-DS = Path("/Users/josealencar/Library/CloudStorage/GoogleDrive-josenunesalencar@gmail.com/"
-          "Outros computadores/Meu Mac/Datasets Big documments/Charles_PSTOV-12-07-27")
+DS = None  # resolved in main() from MLLUND_DATA_ROOT
 LIMB=("I","II","III","aVR","aVL","aVF"); VALL=("V1","V2","V3","V4","V5","V6","V7","V8","V9")
 
 def nnode(torso,xyz): return int(np.linalg.norm(torso-np.asarray(xyz,float),axis=1).argmin())
@@ -32,6 +29,7 @@ def RS(w,qs,qe):
     return float(max(seg.max(),0.0)), float(min(seg.min(),0.0)), float(seg.max()-seg.min())
 
 def main():
+    DS=wdp.data_root()
     pt=DS/"027"; geom=wdp.load_charles_geometry(pt); torso=geom.torso_pts
     A=sio.loadmat(pt/"FwdInvTransforms/2012-07-27Subject_forward_matrix.mat",
                   squeeze_me=True,struct_as_record=False)["A"]
@@ -47,9 +45,6 @@ def main():
     vnode={v:nnode(torso,audV[v]) for v in VALL if v in audV}
 
     events,_=wdp.load_charles_events(pt)
-    pre_map=wdp.find_anatomical_electrodes(geom.electrode_xyz,geom.heart_pts,
-                                           wdp.build_heart_frame(geom.heart_pts,geom.torso_pts)) \
-            if False else None  # QRS window taken from limb leads below
 
     rows=[]
     for ev in events:
@@ -78,7 +73,7 @@ def main():
     df=pd.DataFrame(rows); df.to_csv(RES/"bem_v1v9_direction.csv",index=False); n=len(df)
 
     L=[f"# pt027 BEM — V1-V9 precordial direction & contamination, {n} REAL paced beats\n",
-       f"Dataset: Google-Drive Charles_PSTOV. Offset peak {df['dWCT_peak'].mean():.3f}±{df['dWCT_peak'].std():.3f} (model units).\n",
+       f"Offset peak {df['dWCT_peak'].mean():.3f}±{df['dWCT_peak'].std():.3f} mV.\n",
        "## Per-lead contamination % (median across beats) and R/S change ML vs Lund\n",
        "| Lead | contam% (median) | R Lund→ML (mean) | S Lund→ML (mean) | ptp ML/Lund |",
        "|---|---:|---:|---:|---:|"]
