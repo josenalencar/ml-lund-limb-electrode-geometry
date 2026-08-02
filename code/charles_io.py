@@ -28,9 +28,7 @@ from pathlib import Path
 from dataclasses import dataclass, field
 from typing import Optional
 import numpy as np
-import pandas as pd
 import scipy.io as sio
-from scipy.spatial.distance import cdist
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 
@@ -364,22 +362,7 @@ def detect_qrs(leads: dict, pad: int = 6) -> tuple[int, int]:
     return s, e
 
 
-def lead_amplitudes(leads: dict, qrs: tuple[int,int]) -> dict:
-    s, e = qrs
-    out = {}
-    for k, sig in leads.items():
-        seg = sig[s:e+1]
-        out[k] = {
-            "ptp": float(seg.max() - seg.min()),
-            "peak_signed": float(seg.max() if abs(seg.max()) > abs(seg.min()) else seg.min()),
-            "max_abs": float(np.max(np.abs(seg))),
-        }
-    return out
 
-
-# --------------------------------------------------------------------------- #
-# Per-dataset loaders → list[Event]
-# --------------------------------------------------------------------------- #
 @dataclass
 class PatientGeometry:
     patient_id: str
@@ -513,7 +496,8 @@ def load_charles_events(patient_dir: Path) -> tuple[list[Event], HeartFrame]:
             ventricle=kind,
             pacing_xyz=site,
             pacing_in_torso_coords=False,   # CARTO coords are in heart-electrical-system, NOT torso CT
-            signal=arr, sampling_hz=2000,   # documented in the dataset ReadMe n_repeats=len(run_files),
+            # 2000 Hz is documented in the dataset ReadMe
+            signal=arr, sampling_hz=2000, n_repeats=len(run_files),
             pacing_xyz_origin_label="CARTOPacingSites.txt",
         ))
     return events, carto_frame

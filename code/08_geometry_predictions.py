@@ -22,7 +22,7 @@ Outputs -> ../results/{table1_dataset.csv, table1_dataset.md, geom_predictions.c
 """
 from __future__ import annotations
 from pathlib import Path
-import json, sys, importlib.util
+import json, sys
 import numpy as np
 import pandas as pd
 from scipy import stats
@@ -34,8 +34,7 @@ DATA   = PROJ / "data"; RESULTS = PROJ / "results"; FIGA = PROJ / "figures" / "a
 import charles_io
 DS     = charles_io.data_root()
 import charles_io as wdp
-spec = importlib.util.spec_from_file_location("ac", str(Path(__file__).parent / "02_apply_corrections.py"))
-m = importlib.util.module_from_spec(spec); spec.loader.exec_module(m)
+import cohort as m
 
 VANT = ["V1","V2","V3","V4","V5","V6"]; VPOST = ["V7","V8","V9"]; VALL = VANT + VPOST
 VAUD = json.loads((DATA / "vlead_picks_audited.json").read_text())   # hand-audited V1-V9

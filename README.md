@@ -37,7 +37,8 @@ results/
 
 code/
   charles_io.py                Readers for the Charles/PSTOV datasets, 12-lead derivation and
-                               QRS detection. Shared by the scripts below.
+                               QRS detection.
+  cohort.py                    The 12-subject list and the surface-mesh readers.
   03_final_analysis.py         WCT displacement, lead rotations, frontal axis, limb-lead vectors.
   04_pt027_bem_signal.py       Boundary-element forward simulation, limb leads and precordial
                                contamination for pt027.
@@ -63,6 +64,11 @@ python code/15_bem_v1v9_direction.py    # V1-V9 per-lead analysis
 `MLLUND_DATA_ROOT` must point at the directory holding the per-subject folders (`027`, `028`,
 `029`) and the `ECGI_Challenge_2026_Training` directory. The scripts fail with an explicit
 message if it is unset.
+
+Running the four scripts against the source data regenerates `results/` exactly. Verified on
+2026-08-02: `final_geometry.csv`, `table1_dataset.csv` and `pt027_bem_signal.csv` reproduce
+bit for bit, and `bem_v1v9_direction.csv` agrees to 3e-09, the floating-point tolerance of the
+regularized inverse.
 
 ## Units and conventions
 
