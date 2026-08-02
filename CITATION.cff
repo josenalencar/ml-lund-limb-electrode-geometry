@@ -1,0 +1,16 @@
+cff-version: 1.2.0
+message: "If you use these data or code, please cite the article below."
+title: "Mason-Likar vs Lund limb-electrode geometry: derived data and analysis code"
+authors:
+  - family-names: "de Alencar"
+    given-names: "Jose Nunes"
+    affiliation: "Instituto Dante Pazzanese de Cardiologia, Sao Paulo, Brazil"
+license: CC-BY-4.0
+preferred-citation:
+  type: article
+  title: "Geometric distortion of the limb-lead system under Mason-Likar electrode placement"
+  authors:
+    - family-names: "de Alencar"
+      given-names: "Jose Nunes"
+  journal: "Journal of Electrocardiology"
+  year: 2026
